@@ -1,9 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 def simulation_bm(
-    d: int,
     t_start: float,
     t_end: float,
     x_start: np.ndarray = np.array([0.0]),
@@ -14,28 +12,27 @@ def simulation_bm(
     returning time-position pairs for d = 1.
 
     Returns:
-        np.ndarray of shape (n_steps + 1, 2), where each row is [time, position]
+        np.ndarray of shape (n_steps, 2), where each row is [time, position]
     """
-    assert d == 1, "This function only supports d = 1 for time-position output"
-
     n_steps = max(1, int(steps_per_unit * (t_end - t_start)))
     dt = (t_end - t_start) / n_steps
 
     # Simulate 1D Brownian motion
-    increments = np.random.normal(loc=0.0, scale=np.sqrt(dt), size=n_steps)
+    increments = np.random.normal(loc=0.0, scale=np.sqrt(dt), size=n_steps-1)
     W = np.cumsum(increments)
     W += x_start[0]
     W = np.insert(W, 0, x_start[0])  # include starting point
 
-    times = np.linspace(t_start, t_end, n_steps + 1)
+    time_points = np.linspace(t_start, t_end, n_steps)
 
-    return np.column_stack((times, W))
+    return np.column_stack((time_points, W))
 
 
+# TODO: get back to this function later
 def simulation_gbm(
     d: int,
     t_start: float,
-    t_end: float,
+    t_end: np.ndarray,
     x_start: np.ndarray,  # shape (d,)
     mu: np.ndarray,       # shape (d,)
     C: np.ndarray,        # shape (d, d)
@@ -70,7 +67,7 @@ def simulation_gbm(
     return x
 
 
-def sample_I() -> tuple[np.ndarray, float]:
+def sample_I() -> tuple[np.ndarray, float, int]:
     values = [
         np.array([0, 0]),
         np.array([1, 0]),
@@ -83,7 +80,7 @@ def sample_I() -> tuple[np.ndarray, float]:
 
     i = np.random.choice(len(values), p=probs)
 
-    return values[i], probs[i]
+    return values[i], probs[i], i
 
 
 def sample_jump(d):
