@@ -1,5 +1,11 @@
 import numpy as np
 
+probs = [1/3, 1/6, 1/6, 1/6, 1/12, 1/12]
+T_HORIZON = 1
+ALPHA = 0.2
+GAMMA_SHAPE = 0.5
+GAMMA_SCALE = 2.5
+
 
 def simulation_bm(
     t_start: float,
@@ -26,6 +32,9 @@ def simulation_bm(
     time_points = np.linspace(t_start, t_end, n_steps)
 
     return np.column_stack((time_points, W))
+
+X = simulation_bm(0, 1)[0]
+print(type(X))
 
 
 # TODO: get back to this function later
@@ -67,7 +76,7 @@ def simulation_gbm(
     return x
 
 
-def sample_I() -> tuple[np.ndarray, float, int]:
+def sample_I() -> tuple[np.ndarray, int]:
     values = [
         np.array([0, 0]),
         np.array([1, 0]),
@@ -76,11 +85,10 @@ def sample_I() -> tuple[np.ndarray, float, int]:
         np.array([2, 0]),
         np.array([0, 2])
     ]
-    probs = [1/3, 1/6, 1/6, 1/6, 1/12, 1/12]
 
     i = np.random.choice(len(values), p=probs)
 
-    return values[i], probs[i], i
+    return values[i], i
 
 
 def sample_jump(d):
