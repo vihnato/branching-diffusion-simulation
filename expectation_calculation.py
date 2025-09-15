@@ -54,6 +54,7 @@ def c_function(index, t_end, x_end, alpha=ALPHA, T=T_HORIZON, d=1):
 
     else:
         print("Index must be in [0, 5]")
+        return None
 
 
 def survival(t):
@@ -69,7 +70,7 @@ for realization in sample_list:
     survived = 1
     dead = 1
     for particle in realization:
-        if particle.reached_T_HORIZON:
+        if particle.t_end == 1:
             payout_val = np.cos(particle.x_end)
             if particle.t_end_ancestor is None:
                 survived *= payout_val / survival(1)
@@ -79,7 +80,6 @@ for realization in sample_list:
             payout_val = c_function(index=particle.offspring_case, t_end=particle.t_end, x_end=particle.x_end)
             if particle.t_end_ancestor is None:
                 cdf = gamma.cdf(particle.t_end, a=GAMMA_SHAPE, scale=GAMMA_SCALE)
-                print(particle.offspring_case)
                 dead *= payout_val / cdf
             else:
                 cdf = gamma.cdf(particle.t_end - particle.t_end_ancestor, a=GAMMA_SHAPE, scale=GAMMA_SHAPE)
@@ -87,4 +87,37 @@ for realization in sample_list:
 
     print(survived, dead)
 
-#TO DISCUSS: do we interested in the case when k = (1) dies out without reaching T_HORIZON?
+
+from typing import Dict, Tuple
+
+import numpy as np
+import matplotlib
+import matplotlib.pyplot as plt
+from model_simulation import realization_for_plot
+
+# matplotlib.use('TkAgg')  # Solution for the error: 'FigureCanvasInterAgg' object has no attribute 'tostring_rgb'
+
+
+def plot_branching_paths(paths: Dict[Tuple[int, ...], np.ndarray]) -> None:
+    """
+    Plot all particle paths from a diffusion branching process.
+    """
+
+    plt.figure(figsize=(15, 6))
+
+    for label, path in paths.items():
+        # print(label, path)
+
+        times = path[:, 0]
+        positions = path[:, 1]
+        plt.plot(times, positions, label=str(label))
+        plt.legend()
+
+
+if __name__ == "__main__":
+    seed = np.random.randint(0, 10 ** 6)  # generate a random seed
+    np.random.seed(seed)
+
+    plot_branching_paths(realization_for_plot)
+    plt.title(f"Seed used: {seed}")
+    plt.show()

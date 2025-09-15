@@ -5,7 +5,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 from model_simulation import realization_for_plot
 
-matplotlib.use('TkAgg')  # Solution for the error: 'FigureCanvasInterAgg' object has no attribute 'tostring_rgb'
+# matplotlib.use('TkAgg')  # Solution for the error: 'FigureCanvasInterAgg' object has no attribute 'tostring_rgb'
 
 
 def plot_branching_paths(paths: Dict[Tuple[int, ...], np.ndarray]) -> None:
